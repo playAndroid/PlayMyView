@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="circleCount" format="integer" />
+    <attr name="circleColor" format="color" />
+    <attr name="interval" format="integer" />
+
+    <declare-styleable name="MyLoadingView">
+        <attr name="circleCount" />
+        <attr name="circleColor" />
+        <attr name="interval" />
+    </declare-styleable>
+
+</resources>
