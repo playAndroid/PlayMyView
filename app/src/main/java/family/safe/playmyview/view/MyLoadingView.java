@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -31,6 +32,7 @@ public class MyLoadingView extends View {
     private int witePoint = -1;//白点数量
     private static boolean isVisit = true;
     private int height;
+    private Runnable mRunnable;
 
     public MyLoadingView(Context context) {
         this(context, null);
@@ -39,6 +41,8 @@ public class MyLoadingView extends View {
     public MyLoadingView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
+
+    private int mActivatedCount = 0;
 
     public MyLoadingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -63,19 +67,32 @@ public class MyLoadingView extends View {
         }
         typedArray.recycle();
         setPaint();
-        new Thread() {
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                while (isVisit) {
+//                    SystemClock.sleep(mInterval * 1000);
+//                    postInvalidate();
+//                    Log.e("hlk", "ThreadThreadThreadThreadThread");
+//                }
+//            }
+//        }.start();
+
+        mRunnable = new Runnable() {
             @Override
             public void run() {
-                while (isVisit) {
-                    SystemClock.sleep(mInterval * 1000);
-                    postInvalidate();
-                    Log.e("hlk", "ThreadThreadThreadThreadThread");
+                mActivatedCount++;
+                if (mActivatedCount > mCircleCount) {
+                    mActivatedCount = 0;
                 }
+                Log.e("hlk", "ThreadThreadThreadThreadThread");
+                invalidate();
+                postDelayed(this, mInterval*1000);
             }
-        }.start();
+        };
     }
 
-    public void dismiss(){
+    public void dismiss() {
 
     }
 
@@ -93,6 +110,31 @@ public class MyLoadingView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        getHandler().post(mRunnable);
+        Log.e("hlk", "onAttachedToWindow");
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.e("hlk", "onDetachedFromWindow");
+        getHandler().removeCallbacks(mRunnable);
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        Log.e("hlk", "onVisibilityChanged");
+        if (visibility == VISIBLE) {
+            Log.e("hlk", "VISIBLE");
+        } else {
+            Log.e("hlk", "INVISIBLE");
+        }
     }
 
     @Override
